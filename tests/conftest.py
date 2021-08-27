@@ -43,7 +43,7 @@ def reset_tables():
 
     This allows tests to be isolated from each other
     preventing cross-contamination of test state while
-    still allowing the tests to run fast (not downgrage/upgrade of migrations)
+    still allowing the tests to run fast
     """
     session = Session()
     meta = Base.metadata

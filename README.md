@@ -14,8 +14,10 @@ To make your SQLAlchemy model (entity) support just inherit it from `SoftDeleteM
 ## Example Class Creation
 
 ```python
+from sqlalchemy.ext.declarative import declarative_base
 from sqla_softdelete import SoftDeleteMixin
 
+Base = declarative_base()
 
 class Account(SoftDeleteMixin, Base):
     __tablename__ = 'account'

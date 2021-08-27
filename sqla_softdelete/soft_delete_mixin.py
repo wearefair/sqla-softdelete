@@ -17,9 +17,9 @@ class SoftDeleteMixin:
             deleted_at (datetime, optional): optionally takes the deleted_at date. Defaults
                 to the current time in UTC.
         Example usage:
-            account1.delete(session) -> deleted_at set to datetime.utcnow() and commited to db
+            account1.delete(session) -> deleted_at set to datetime.utcnow() and commited to database
             account1.delete(deleted_at=datetime(2020,1,1)) -> deleted at set to Jan 1, 2020 and
-                committing to the db is handled by the caller
+                committing to the database is handled by the caller
         """
         self.deleted_at = deleted_at or datetime.utcnow()
         if session:
@@ -31,7 +31,7 @@ class SoftDeleteMixin:
             session (sqlalchemy.orm.Session, optional): optioanlly takes a session object.
                 If provided, will commit the changes to the database.
         Example usage:
-            account1.restore(session) -> deleted_at set to None and commited to db
+            account1.restore(session) -> deleted_at set to None and commited to database
             account1.restore() -> deleted at set to None and committing handled by the caller
         """
         self.deleted_at = None
@@ -65,7 +65,7 @@ def before_compile(query):
     Example usage:
        session.query(Account).all() -> returns all non-deleted accounts
        session.query(Account).execution_options(include_deleted=True).all() -> returns
-           all accounts, including deleted ones
+           all accounts, including deleted accounts
     """
     include_deleted = query._execution_options.get('include_deleted', False)
     if include_deleted:
