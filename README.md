@@ -9,7 +9,7 @@ How to install
 
 How to use
 ------------    
-To make your SQLAlchemy model (entity) support just inherit it from `SoftDeleteMixin`. 
+To make your SQLAlchemy model support soft deletes, just inherit from `SoftDeleteMixin`.
 
 ## Example Class Creation
 
@@ -56,7 +56,7 @@ class Account(SoftDeleteMixin, Base):
 
 ### Fetching All Data
 
-(Soft) Deleted accounts will be included from query results when execution options are passed.
+(Soft) Deleted accounts will be included from query results when `execution_options` are passed.
 ```python
     account = Account(name='account')
 
@@ -93,7 +93,7 @@ Deleting accounts is easy: call `delete` on the account object, with or without 
     actual_account = Account.get(Session, account.id)
     print(f'Actual accounts: {actual_account}')
 ```
-In the above example, actual account will return None.
+In the above example, `actual_account` will return `None`.
 
 Additionally, this can be done using the normal sqlalchemey update syntax.
 ```python
@@ -107,7 +107,7 @@ Additionally, this can be done using the normal sqlalchemey update syntax.
     actual_account = Account.get(Session, account.id)
     print(f'Actual accounts: {actual_account}')
 ```
-This will also return None.
+This will also return `None`.
 
 ### Restoring Data
 Restoring accounts is easy: call `restore` on the account object, with or without passing a `session`. If the session is passed, it will commit the changes to the database.
@@ -122,7 +122,7 @@ Restoring accounts is easy: call `restore` on the account object, with or withou
     actual_account = Account.get(Session, account.id)
     print(f'Actual accounts: {actual_account}')
 ```
-In the above example, actual account will return the row and deleted_at will be None.
+In the above example, `actual_account` will return the row and `deleted_at` will be `y`.
 
 Additionally, this can be done using the normal sqlalchemey update syntax.
 ```python
