@@ -10,7 +10,9 @@ How to install
 How to use
 ------------    
 To make your SQLAlchemy model (entity) support just inherit it from `SoftDeleteMixin`. 
-For instance:
+
+## Example Class Creation
+
 ```python
 from sqla_softdelete import SoftDeleteMixin
 
@@ -22,28 +24,115 @@ class Account(SoftDeleteMixin, Base):
     name = sa.Column(sa.Text, nullable=False)
     email = sa.Column(sa.String(128), nullable=False, index=True)
 
-    def __init__(self, name: str = '', email: str = '', phone: str = ''):
-        self.name = name
-        self.email = email
-        self.phone = phone
-
-    def __repr__(self):
-        return f'Account(id={self.id}, name={self.name}, email={self.email})'
-
-    def __str__(self):
-        return f'{self.name}: {self.email})'
 ```
 
-All set now.
+## Example Usage
+
+### Fetching Non-Deleted Data
+
+(Soft) Deleted accounts will automatically be excluded from query results.
 ```python
     account = Account(name='account')
-    
-    Session.add(account)
-    Session.flush()
-    
-    account.delete()
-    Session.expire(account)
 
-    actual_accounts = dbsession.query(Account).all() 
+    Session.add(account)
+    Session.commit()
+
+    actual_accounts = Session.query(Account).all()
     print(f'Actual accounts: {actual_accounts}')
 ```
+
+(Soft) Deleted accounts will automatically be excluded when fetching via `get`.
+```python
+    account = Account(name='account')
+
+    Session.add(account)
+    Session.commit()
+
+    actual_account = Account.get(Session, account.id)
+    print(f'Actual accounts: {actual_account}')
+```
+
+### Fetching All Data
+
+(Soft) Deleted accounts will be included from query results when execution options are passed.
+```python
+    account = Account(name='account')
+
+    Session.add(account)
+    account.delete()
+    Session.commit()
+
+    actual_accounts = Session.query(Account).execution_options(include_deleted=True).all()
+    print(f'Actual accounts: {actual_accounts}')
+```
+
+(Soft) Deleted accounts will be included when fetching via `get` with `include_deleted = True`.
+```python
+    account = Account(name='account')
+
+    Session.add(account)
+    account.delete()
+    Session.commit()
+
+    actual_account = Account.get(Session, account.id, True)
+    print(f'Actual accounts: {actual_account}')
+```
+
+### Deleting Data
+Deleting accounts is easy: call `delete` on the account object, with or without passing a `session`. If the session is passed, it will commit the changes to the database. The `deleted_at` date can also be passed; otherwise, `deleted_at` defaults to use the current time in UTC.
+```python
+    account = Account(name='account')
+
+    Session.add(account)
+    Session.commit()
+
+    account.delete(Session)
+
+    actual_account = Account.get(Session, account.id)
+    print(f'Actual accounts: {actual_account}')
+```
+In the above example, actual account will return None.
+
+Additionally, this can be done using the normal sqlalchemey update syntax.
+```python
+    account = Account(name='account')
+
+    Session.add(account)
+    account.deleted_at = datetime.utcnow()
+    Session.commit()
+
+
+    actual_account = Account.get(Session, account.id)
+    print(f'Actual accounts: {actual_account}')
+```
+This will also return None.
+
+### Restoring Data
+Restoring accounts is easy: call `restore` on the account object, with or without passing a `session`. If the session is passed, it will commit the changes to the database.
+```python
+    account = Account(name='account')
+
+    Session.add(account)
+    account.delete()
+    account.restore()
+    Session.commit()
+
+    actual_account = Account.get(Session, account.id)
+    print(f'Actual accounts: {actual_account}')
+```
+In the above example, actual account will return the row and deleted_at will be None.
+
+Additionally, this can be done using the normal sqlalchemey update syntax.
+```python
+    account = Account(name='account')
+
+    Session.add(account)
+    account.delete()
+    account.deleted_at = None
+    Session.commit()
+
+
+    actual_account = Account.get(Session, account.id)
+    print(f'Actual accounts: {actual_account}')
+```
+This will also return the restored row.
